@@ -12,7 +12,7 @@ public class SimpleVMDriver {
                 + "pop x\n"
                 ));
 		SimpleVM vm = new SimpleVM(reader1);
-		vm.showList();
+		System.out.println(vm);
 		System.out.println("Size: " + vm.list.size());
 		
 		System.out.println("--------------------");
@@ -29,7 +29,7 @@ public class SimpleVMDriver {
                 ));
 
         vm = new SimpleVM(reader2);
-        vm.showList();
+        System.out.println(vm);
         System.out.println("Size: " + vm.list.size());
 		
 	}

@@ -68,13 +68,22 @@ public class SimpleVM
     }
     
     /**
-     * Utility method: Prints each element of the list to console.
-     * @implNote needs to eventually be an override of the toString() for coverage purposes.
+     * Prints each element of the list to console.
      */
-    public void showList() {
-    	for (String s : list) {
-    		System.out.println(s);
+    @Override
+    public String toString() {
+    	StringBuilder str = new StringBuilder();
+    	str.append("[");
+    	for (int i = 0; i < list.size(); i++) {
+    		if (i == list.size() - 1) {
+    			str.append(list.get(i));
+    			break;
+    		}
+    		str.append(list.get(i));
+    		str.append(", ");
     	}
+    	str.append("]");
+		return str.toString();
     }
     
     /**

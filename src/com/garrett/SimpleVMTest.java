@@ -206,4 +206,41 @@ public class SimpleVMTest extends TestCase {
         assertEquals("", vm.getItemValue(vm.list.get(6)));
         assertEquals("y", vm.getItemValue(vm.list.get(7)));
     }
+    
+    /**
+     * Tests the toString method of the list containing all the passed in program's
+     * list of commands.
+     * @throws IOException 
+     */
+    @Test
+    public void testtoString() throws IOException {
+    	/* Try program with no commands */
+    	Scanner reader0 = new Scanner(new StringReader(
+                ""
+                ));
+    	SimpleVM vm = new SimpleVM(reader0);
+        assertEquals("[]", vm.toString());
+                
+		Scanner reader1 = new Scanner(new StringReader(
+                "push 5\n"
+                + "pop x\n"
+                ));
+
+        vm = new SimpleVM(reader1);
+        assertEquals("[push 5, pop x]", vm.toString());
+        
+        Scanner reader2 = new Scanner(new StringReader(
+                "push 5\n"
+                + "push 7\n"
+                + "add\n"
+                + "pop x\n"
+                + "push x\n"
+                + "push 3\n"
+                + "add\n"
+                + "pop y\n"
+                ));
+
+        vm = new SimpleVM(reader2);
+        assertEquals("[push 5, push 7, add, pop x, push x, push 3, add, pop y]", vm.toString());
+    }
 }
