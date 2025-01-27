@@ -3,7 +3,8 @@ package com.garrett;
 import java.util.Stack;
 
 /**
- * Operation to push a value onto the stack.
+ * The class that simulates the push command that places either a constant or the value
+ * of a variable on top of the stack.
  * @author Franklin U. Comp 311
  */
 public class PushOperation implements Operation {
