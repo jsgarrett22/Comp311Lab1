@@ -1,10 +1,12 @@
-package com.garrett;
+package com.garrett.test;
 
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Scanner;
 
 import org.junit.Test;
+
+import com.garrett.SimpleVM;
 
 import junit.framework.TestCase;
 
@@ -51,6 +53,10 @@ public class SimpleVMTest extends TestCase {
         assertEquals("add", vm.list.get(6));
         assertEquals("pop y", vm.list.get(7));
 	}
+	
+	/**
+	 * Tests converting push line items to push operation objects.
+	 */
 	
 	@Test
 	/**

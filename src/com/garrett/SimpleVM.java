@@ -6,10 +6,14 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 
+import javax.naming.OperationNotSupportedException;
+
 public class SimpleVM
 {   
-	List<String> list = new ArrayList<String>();
-	Stack<Operation> stack = new Stack<Operation>();
+	public List<String> list;
+	public List<Operation> operations;
+	public SymbolTable symbols;
+	public Stack<Integer> stack;
 	
     /**
      * Creates a SimpleVM with the program contained in 
@@ -19,6 +23,12 @@ public class SimpleVM
      */
     public SimpleVM(Scanner scanner) throws IOException
     {
+    	// Initialize variables
+    	list = new ArrayList<String>();
+    	operations = new ArrayList<Operation>();
+    	symbols = new SymbolTable();
+    	stack = new Stack<Integer>();
+    	
         // Convert the text program into a list of Operation objects
     	convertTextToList(scanner);
     }
@@ -29,6 +39,9 @@ public class SimpleVM
     public void run()
     {
         //  Execute the program
+    	for (Operation o : operations) {
+    		o.execute(0, stack, symbols);
+    	}
     }
     
     /**
@@ -51,7 +64,6 @@ public class SimpleVM
      */
     public void convertTextToList(Scanner scanner) {
     	while (scanner.hasNextLine()) {
-    		// print each item to console
     		list.add(scanner.nextLine());
     	}
     }
@@ -59,16 +71,41 @@ public class SimpleVM
     /**
      * Converts each list element to its corresponding operation type.
      * @author Joshua S. Garrett
+     * @throws OperationNotSupportedException 
      */
-    public void convertListToOperations(List<String> list) {
+    public void convertListToOperations(List<String> list) throws OperationNotSupportedException {
     	// for each element in list
+    		// get list item
     		// get command
-    		// get the value
+    		// get the value (string)
     		//		new PushOperation(value);
+    	String cmd = "";
+    	String value = "";
+    	for (int i = 0; i < list.size(); i++) {
+    		// get current listItem
+    		String currentItem = list.get(i);
+    		// get command
+    		cmd = getItemCommand(currentItem);
+    		if (cmd.equalsIgnoreCase("push") && hasValue(currentItem)) {
+    			// get value
+    			value = getItemValue(currentItem);
+    			/* THIS DOES NOT SUPPORT HANDLING VARIABLE VALUES YET */
+    			// create new push operation
+    			Operation operation = new PushOperation(Integer.parseInt(value));
+    			operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("pop")) {
+    			System.out.println(cmd);
+    		} else if (cmd.equalsIgnoreCase("add")) {
+    			System.out.println(cmd);
+    		} else {
+    			throw new OperationNotSupportedException("That operation is not supported.");
+    		}
+    	}
     }
     
     /**
      * Prints each element of the list to console.
+     * @author Joshua S. Garrett
      */
     @Override
     public String toString() {

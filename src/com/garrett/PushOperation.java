@@ -12,11 +12,13 @@ public class PushOperation implements Operation {
 
     public PushOperation(int value) {
         this.value = value;
+        System.out.println("New PushOperation created with value: " + value);
     }
 
     @Override
     public int execute(int programCounter, Stack<Integer> stack, SymbolTable symbolTable) {
         stack.push(value);
+        System.out.println("Pushing value '" + value + "' on stack.");
         return programCounter + 1;
     }
 
