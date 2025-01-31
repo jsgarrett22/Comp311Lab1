@@ -1,8 +1,12 @@
 package com.garrett.test;
 
+import static org.junit.Assert.assertThrows;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.util.Scanner;
+
+import javax.naming.OperationNotSupportedException;
 
 import org.junit.Test;
 
@@ -56,7 +60,31 @@ public class SimpleVMTest extends TestCase {
 	
 	/**
 	 * Tests converting push line items to push operation objects.
+	 * @throws IOException 
+	 * @throws OperationNotSupportedException 
 	 */
+	@Test
+	public void testconvertListToOperations() throws IOException, OperationNotSupportedException {
+		/* Test simple, invalid program case */
+		Scanner reader1 = new Scanner(new StringReader(
+				"calculate 100\n"
+				));
+		
+		SimpleVM vm1 = new SimpleVM(reader1);
+		assertThrows(OperationNotSupportedException.class, () -> 
+			vm1.convertListToOperations(vm1.list));
+		
+		/* Test simple, valid program case */
+		Scanner reader2 = new Scanner(new StringReader(
+                "push 5\n"
+                + "push 7\n"
+                + "add"
+                ));
+		
+        SimpleVM vm2 = new SimpleVM(reader2);
+        vm2.convertListToOperations(vm2.list);
+        assertEquals(3, vm2.operations.size());
+	}
 	
 	@Test
 	/**
@@ -71,6 +99,7 @@ public class SimpleVMTest extends TestCase {
 
         SimpleVM vm = new SimpleVM(reader);
         vm.run();
+        assertEquals(1, vm.stack.size());
         assertEquals(5, vm.getValue("x"));
     }
     

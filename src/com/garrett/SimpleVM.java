@@ -14,6 +14,7 @@ public class SimpleVM
 	public List<Operation> operations;
 	public SymbolTable symbols;
 	public Stack<Integer> stack;
+	private int programCount;
 	
     /**
      * Creates a SimpleVM with the program contained in 
@@ -28,6 +29,7 @@ public class SimpleVM
     	operations = new ArrayList<Operation>();
     	symbols = new SymbolTable();
     	stack = new Stack<Integer>();
+    	programCount = 0;
     	
         // Convert the text program into a list of Operation objects
     	convertTextToList(scanner);
@@ -40,7 +42,7 @@ public class SimpleVM
     {
         //  Execute the program
     	for (Operation o : operations) {
-    		o.execute(0, stack, symbols);
+    		programCount += o.execute(0, stack, symbols);
     	}
     }
     
@@ -89,11 +91,25 @@ public class SimpleVM
     		if (cmd.equalsIgnoreCase("push") && hasValue(currentItem)) {
     			// get value
     			value = getItemValue(currentItem);
+    			char c = value.charAt(0);
+    			if (Character.isDigit(c)) {
+    				System.out.println("The value " + value + " is numeric.");
+    				// push constant on top of stack
+    				Operation operation = new PushOperation(Integer.parseInt(value));
+        			operations.add(operation);
+    			} else {
+    				// value is not numeric, and is a variable name.
+    				System.out.println("The value " + value + " is not numeric.");
+    				Operation operation = new PushOperation(symbols.getValue(value));
+    				operations.add(operation);
+    			}
+    		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
+    			// get value
+    			value = getItemValue(currentItem);
     			/* THIS DOES NOT SUPPORT HANDLING VARIABLE VALUES YET */
-    			// create new push operation
-    			Operation operation = new PushOperation(Integer.parseInt(value));
-    			operations.add(operation);
-    		} else if (cmd.equalsIgnoreCase("pop")) {
+    			char c = value.charAt(0);
+    			System.out.println(c);
+    			// create new pop operation
     			System.out.println(cmd);
     		} else if (cmd.equalsIgnoreCase("add")) {
     			System.out.println(cmd);
