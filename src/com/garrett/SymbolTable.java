@@ -37,8 +37,8 @@ public class SymbolTable
     		System.out.println("Symbol table does not contain the variable " + name 
     				+ ". Adding to table.");
     	} else {
-    		// otherwise, change the variable
-    		symbols.add(symbolLocation, new Symbol(name, value));
+    		// otherwise, set the new value for the symbol
+    		symbols.get(symbolLocation).setValue(value);
     		System.out.println("Symbol table contains the variable " + name + ". Changing symbol " 
     		+ name + " to " + value + ".");
     	}

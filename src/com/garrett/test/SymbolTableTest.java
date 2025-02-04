@@ -37,15 +37,21 @@ public class SymbolTableTest {
 		symbols.setValue("x", 5);
 		assertEquals(5, symbols.getValue("x"));
 		
-		/* Try setting a duplicate symbol in the table and retrieve it */
-		symbols.setValue("x", 5);
-		assertEquals(5, symbols.getValue("x"));
-		assertEquals(2, symbols.size());
-		
 		/* Try getting an undefined symbol */
 		assertThrows("A symbol can not be empty",
 				RuntimeException.class, 
 				() -> symbols.getValue("a"));
+	}
+	
+	@Test
+	public void testReplacingExistingVariable() {
+		SymbolTable symbols = new SymbolTable();
+		symbols.setValue("x", 5);
+		assertEquals(1, symbols.size());
+		assertEquals(5, symbols.getValue("x"));
+		symbols.setValue("x", 10);
+		assertEquals(1, symbols.size());
+		assertEquals(10, symbols.getValue("x"));
 	}
 	
 	/**
