@@ -30,8 +30,17 @@ public class SymbolTable
      */
     public void setValue(String name, int value)
     {
-    	if (!hasSymbol(name)) {
+    	int symbolLocation = hasSymbol(name);
+    	// if table doesn't have the variable, add it
+    	if (symbolLocation == -1) {
     		symbols.add(new Symbol(name, value));
+    		System.out.println("Symbol table does not contain the variable " + name 
+    				+ ". Adding to table.");
+    	} else {
+    		// otherwise, change the variable
+    		symbols.add(symbolLocation, new Symbol(name, value));
+    		System.out.println("Symbol table contains the variable " + name + ". Changing symbol " 
+    		+ name + " to " + value + ".");
     	}
     }
     
@@ -63,18 +72,21 @@ public class SymbolTable
     }
     
     /**
-     * Determines if the symbol table currently contains the symbol or not.
+     * Determines if the table contains the symbol or not.
      * @param string The symbol to check.
-     * @return boolean true if the symbol table current contains that symbol, false if not.
+     * @return int returns the index of the symbol in the list, otherwise returns -1 if it
+     * doesn't exist.
      * @author Joshua S. Garrett
+     * @version Feb 3rd, 2025
      */
-    public boolean hasSymbol(String symbol) {
+    public int hasSymbol(String symbol) {
+    	// if symbol exists
     	for (int i = 0; i < symbols.size(); i++) {
     		Symbol currentSymbol = symbols.get(i);
     		if (currentSymbol.getSymbol().equals(symbol)) {
-    			return true;
+    			return i;		// return it's index
     		}
     	}
-    	return false;
+    	return -1;
     }
 }

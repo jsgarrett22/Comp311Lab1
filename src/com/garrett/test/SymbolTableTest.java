@@ -40,7 +40,7 @@ public class SymbolTableTest {
 		/* Try setting a duplicate symbol in the table and retrieve it */
 		symbols.setValue("x", 5);
 		assertEquals(5, symbols.getValue("x"));
-		assertEquals(1, symbols.size());
+		assertEquals(2, symbols.size());
 		
 		/* Try getting an undefined symbol */
 		assertThrows("A symbol can not be empty",
@@ -58,10 +58,10 @@ public class SymbolTableTest {
 		symbols.setValue("y", 10);
 		symbols.setValue("z", 10);
 		assertEquals(3, symbols.size());
-		assertTrue(symbols.hasSymbol("x"));
-		assertTrue(symbols.hasSymbol("y"));
-		assertTrue(symbols.hasSymbol("z"));
-		assertFalse(symbols.hasSymbol("a"));
+		assertEquals(0, symbols.hasSymbol("x"));
+		assertEquals(1, symbols.hasSymbol("y"));
+		assertEquals(2, symbols.hasSymbol("z"));
+		assertEquals(-1, symbols.hasSymbol("a"));
 	}
 
 }

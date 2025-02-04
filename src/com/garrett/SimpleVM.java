@@ -80,7 +80,7 @@ public class SimpleVM
     		// get list item
     		// get command
     		// get the value (string)
-    		//		new PushOperation(value);
+    		// 		new PushOperation(value);
     	String cmd = "";
     	String value = "";
     	for (int i = 0; i < list.size(); i++) {
@@ -104,7 +104,7 @@ public class SimpleVM
     				operations.add(operation);
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
-    			// get value
+    			// get the full string following the 'pop' command
     			value = getItemValue(currentItem);
     			/* THIS DOES NOT SUPPORT HANDLING VARIABLE VALUES YET */
     			char c = value.charAt(0);
