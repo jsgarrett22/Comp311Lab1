@@ -14,7 +14,7 @@ public class SimpleVM
 	public List<Operation> operations;
 	public SymbolTable symbols;
 	public Stack<Integer> stack;
-	public int programCount;
+	private int programCount;
 	
     /**
      * Creates a SimpleVM with the program contained in 
@@ -113,7 +113,7 @@ public class SimpleVM
         				operations.add(operation);
     				} else {
     					// symbol doesn't exist
-    					System.out.println("Symbol: " + value + " doesn't exist yet.");
+    					throw new RuntimeException("The variable is not defined in the table.");    				
     				}
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
@@ -182,5 +182,13 @@ public class SimpleVM
      */
     public boolean hasValue(String lineItem) {
     	return lineItem.contains(" ") ? true : false;
+    }
+    
+    /**
+     * Returns the current program count.
+     * @return the current count
+     */
+    public int getProgramCount() {
+    	return this.programCount;
     }
 }

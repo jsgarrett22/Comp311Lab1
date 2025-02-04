@@ -19,7 +19,7 @@ public class PushOperation implements Operation {
     public int execute(int programCounter, Stack<Integer> stack, SymbolTable symbolTable) {
         stack.push(value);
         System.out.println("Pushing value '" + value + "' on stack.");
-        return programCounter + 1;
+		return programCounter + 1;
     }
 
 }

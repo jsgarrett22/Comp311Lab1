@@ -116,7 +116,35 @@ public class SimpleVMTest extends TestCase {
 		
 		SimpleVM vm = new SimpleVM(reader);
 		vm.run();
+		assertEquals(7, vm.getValue("x"));
 	}
+	
+	/**
+	 * Tests an extensive push, pop, push program.
+	 */
+	public void testComplicatedPushPopPush() throws OperationNotSupportedException, IOException {
+		Scanner reader = new Scanner(new StringReader(
+                "push 5\n"
+                + "push 7\n"
+                + "push 9\n"
+                + "push 11\n"
+                + "pop x\n"
+                + "pop y\n"
+                + "push x\n"
+                + "pop z\n"
+                ));
+		
+		SimpleVM vm = new SimpleVM(reader);
+		vm.run();
+		assertEquals(11, vm.getValue("x"));
+		assertEquals(9, vm.getValue("y"));
+		assertEquals(11, vm.getValue("z"));
+		assertEquals(8, vm.list.size());
+		assertEquals(2, vm.stack.size());
+		assertEquals(7, vm.stack.getLast().intValue());
+		System.out.println(vm);
+	}
+	
 	
 	/**
 	 * Tests converting push line items to push operation objects.
