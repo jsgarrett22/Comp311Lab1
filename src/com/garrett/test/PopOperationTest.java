@@ -38,14 +38,27 @@ public class PopOperationTest {
 		PushOperation push1 = new PushOperation(5);
 		PushOperation push2 = new PushOperation(10);
 		push1.execute(0, stack, symbols);
-		push2.execute(0, stack, symbols);
+		push2.execute(1, stack, symbols);
 		
 		assertEquals(2, stack.size());
 		
 		/* Create PushOperation object #1 */
 		PopOperation pop1 = new PopOperation("x");
-		assertEquals(1, pop1.execute(0, stack, symbols));
+		assertEquals(3, pop1.execute(2, stack, symbols));
+		
+		/* Check all values of the symbol table are correct */
 		assertEquals(10, symbols.getValue("x"));
+		assertEquals(10, symbols.getValue("y"));
+		assertEquals(15, symbols.getValue("z"));
+		
+		/* Create PushOperation object #2 */
+		PopOperation pop2 = new PopOperation("z");
+		assertEquals(4, pop2.execute(3, stack, symbols));
+		
+		/* Check all values of the symbol table are correct again */
+		assertEquals(10, symbols.getValue("x"));
+		assertEquals(10, symbols.getValue("y"));
+		assertEquals(5, symbols.getValue("z"));
 	}
 
 }

@@ -14,15 +14,16 @@ public class SimpleVM
 	public List<Operation> operations;
 	public SymbolTable symbols;
 	public Stack<Integer> stack;
-	private int programCount;
+	public int programCount;
 	
     /**
      * Creates a SimpleVM with the program contained in 
      * the supplied Scanner.
      * 
      * @param scanner the Scanner containing the program
+     * @throws OperationNotSupportedException 
      */
-    public SimpleVM(Scanner scanner) throws IOException
+    public SimpleVM(Scanner scanner) throws IOException, OperationNotSupportedException
     {
     	// Initialize variables
     	list = new ArrayList<String>();
@@ -37,13 +38,17 @@ public class SimpleVM
 
     /**
      * Runs the loaded program.
+     * @throws OperationNotSupportedException 
      */
-    public void run()
+    public void run() throws OperationNotSupportedException
     {
-        //  Execute the program
+        //  convert list items to operation objects and execute each operation
+    	convertListToOperations(list);
+    	
+    	/* for every operation object, invoke it's execute method
     	for (Operation o : operations) {
     		programCount += o.execute(0, stack, symbols);
-    	}
+    	}*/
     }
     
     /**
@@ -55,7 +60,7 @@ public class SimpleVM
     public int getValue(String name)
     {
         //  Looks things up in the symbol table
-        return 0;
+    	return this.symbols.getValue(name);
     }
     
     /**
@@ -96,21 +101,28 @@ public class SimpleVM
     				System.out.println("The value " + value + " is numeric.");
     				// push constant on top of stack
     				Operation operation = new PushOperation(Integer.parseInt(value));
+    				operation.execute(this.programCount, stack, symbols);
         			operations.add(operation);
     			} else {
     				// value is not numeric, and is a variable name.
     				System.out.println("The value " + value + " is not numeric.");
-    				Operation operation = new PushOperation(symbols.getValue(value));
-    				operations.add(operation);
+    				// check if variable is in symbols table
+    				if (symbols.hasSymbol(value) != -1) {
+    					Operation operation = new PushOperation(symbols.getValue(value));
+    					operation.execute(this.programCount, stack, symbols);
+        				operations.add(operation);
+    				} else {
+    					// symbol doesn't exist
+    					System.out.println("Symbol: " + value + " doesn't exist yet.");
+    				}
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
     			// get the full string following the 'pop' command
     			value = getItemValue(currentItem);
-    			/* THIS DOES NOT SUPPORT HANDLING VARIABLE VALUES YET */
-    			char c = value.charAt(0);
-    			System.out.println(c);
-    			// create new pop operation
-    			System.out.println(cmd);
+    			// create new pop operation and execute
+    			Operation operation = new PopOperation(value);
+    			operation.execute(this.programCount, stack, symbols);
+    			operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("add")) {
     			System.out.println(cmd);
     		} else {

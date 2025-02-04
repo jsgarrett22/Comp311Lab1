@@ -31,7 +31,7 @@ public class PopOperation implements Operation {
 		System.out.println("Popping " + value + " off the stack.");
 		symbolTable.setValue(symbol, value);
 		System.out.println("Assigning " + value + " to '" + symbol + "' in the symbol table.");
-		return 0;
+		return programCounter + 1;
 	}
 
 }
