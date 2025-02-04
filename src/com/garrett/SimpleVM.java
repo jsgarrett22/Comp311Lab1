@@ -1,7 +1,7 @@
 package com.garrett;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.EmptyStackException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
@@ -23,7 +23,7 @@ public class SimpleVM
      * @param scanner the Scanner containing the program
      * @throws OperationNotSupportedException 
      */
-    public SimpleVM(Scanner scanner) throws IOException, OperationNotSupportedException
+    public SimpleVM(Scanner scanner)
     {
     	// Initialize variables
     	list = new ArrayList<String>();
@@ -34,16 +34,16 @@ public class SimpleVM
     	
         // Convert the text program into a list of Operation objects
     	convertTextToList(scanner);
+    	convertListToOperations(list);
     }
 
     /**
      * Runs the loaded program.
-     * @throws OperationNotSupportedException 
      */
-    public void run() throws OperationNotSupportedException
+    public void run()
     {
         //  convert list items to operation objects and execute each operation
-    	convertListToOperations(list);
+    	//convertListToOperations(list);
     	
     	/* for every operation object, invoke it's execute method
     	for (Operation o : operations) {
@@ -80,7 +80,7 @@ public class SimpleVM
      * @author Joshua S. Garrett
      * @throws OperationNotSupportedException 
      */
-    public void convertListToOperations(List<String> list) throws OperationNotSupportedException {
+    public void convertListToOperations(List<String> list) {
     	// for each element in list
     		// get list item
     		// get command
@@ -88,9 +88,9 @@ public class SimpleVM
     		// 		new PushOperation(value);
     	String cmd = "";
     	String value = "";
-    	for (int i = 0; i < list.size(); i++) {
+    	for (int i = 0; i < this.list.size(); i++) {
     		// get current listItem
-    		String currentItem = list.get(i);
+    		String currentItem = this.list.get(i);
     		// get command
     		cmd = getItemCommand(currentItem);
     		if (cmd.equalsIgnoreCase("push") && hasValue(currentItem)) {
@@ -101,19 +101,19 @@ public class SimpleVM
     				System.out.println("The value " + value + " is numeric.");
     				// push constant on top of stack
     				Operation operation = new PushOperation(Integer.parseInt(value));
-    				operation.execute(this.programCount, stack, symbols);
-        			operations.add(operation);
+    				operation.execute(this.programCount, this.stack, this.symbols);
+        			this.operations.add(operation);
     			} else {
     				// value is not numeric, and is a variable name.
     				System.out.println("The value " + value + " is not numeric.");
     				// check if variable is in symbols table
-    				if (symbols.hasSymbol(value) != -1) {
-    					Operation operation = new PushOperation(symbols.getValue(value));
+    				if (this.symbols.hasSymbol(value) != -1) {
+    					Operation operation = new PushOperation(this.symbols.getValue(value));
     					operation.execute(this.programCount, stack, symbols);
-        				operations.add(operation);
+    					this.operations.add(operation);
     				} else {
     					// symbol doesn't exist
-    					throw new RuntimeException("The variable is not defined in the table.");    				
+    					throw new EmptyStackException();    				
     				}
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
@@ -121,12 +121,13 @@ public class SimpleVM
     			value = getItemValue(currentItem);
     			// create new pop operation and execute
     			Operation operation = new PopOperation(value);
-    			operation.execute(this.programCount, stack, symbols);
-    			operations.add(operation);
+    			operation.execute(this.programCount, this.stack, this.symbols);
+    			this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("add")) {
     			System.out.println(cmd);
     		} else {
-    			throw new OperationNotSupportedException("That operation is not supported.");
+    			System.out.println("That operation is not supported.");
+    			throw new EmptyStackException();
     		}
     	}
     }

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertThrows;
 import java.io.IOException;
 import java.io.StringReader;
 import java.security.InvalidParameterException;
+import java.util.EmptyStackException;
 import java.util.Scanner;
 
 import javax.naming.OperationNotSupportedException;
@@ -16,6 +17,17 @@ import com.garrett.SimpleVM;
 import junit.framework.TestCase;
 
 public class SimpleVMTest extends TestCase {
+	
+	@Test
+	public void testConstructorDesign() {
+		Scanner reader = new Scanner(new StringReader(
+                "push 5\n"
+                + "pop x\n"
+                ));
+
+        SimpleVM vm = new SimpleVM(reader);
+		assertEquals(2, vm.operations.size());
+	}
 	
 	@Test
 	/**
@@ -66,10 +78,7 @@ public class SimpleVMTest extends TestCase {
 	public void testInvalidPush() throws OperationNotSupportedException, IOException {
 		Scanner reader = new Scanner(new StringReader(
                 "push\n"));
-		
-        SimpleVM vm = new SimpleVM(reader);
-        assertThrows("That operation is not supported.", 
-        		OperationNotSupportedException.class, () -> vm.run());
+		assertThrows(EmptyStackException.class, () -> new SimpleVM(reader));
 	}
 	
 	/**
@@ -79,10 +88,7 @@ public class SimpleVMTest extends TestCase {
 	public void testPushWithoutExistingValue() throws OperationNotSupportedException, IOException {
 		Scanner reader = new Scanner(new StringReader(
                 "push x\n"));
-		
-        SimpleVM vm = new SimpleVM(reader);
-        assertThrows("The variable is not defined in the table.", 
-        		RuntimeException.class, () -> vm.run());
+		assertThrows(EmptyStackException.class, () -> new SimpleVM(reader));
 	}
 
 	/**
@@ -94,10 +100,7 @@ public class SimpleVMTest extends TestCase {
 	public void testInvalidPop() throws OperationNotSupportedException, IOException {
 		Scanner reader = new Scanner(new StringReader(
                 "pop\n"));
-		
-        SimpleVM vm = new SimpleVM(reader);
-        assertThrows("That operation is not supported.", 
-        		OperationNotSupportedException.class, () -> vm.run());
+		assertThrows(EmptyStackException.class, () -> new SimpleVM(reader));
 	}
 	
 	/**
@@ -152,16 +155,14 @@ public class SimpleVMTest extends TestCase {
 	 * @throws OperationNotSupportedException 
 	 */
 	@Test
-	public void testconvertListToOperations() throws IOException, OperationNotSupportedException {
+	public void testconvertListToOperations() {
 		/* Test simple, invalid program case */
 		Scanner reader1 = new Scanner(new StringReader(
 				"calculate 100\n"
 				));
 		
-		SimpleVM vm1 = new SimpleVM(reader1);
-		assertThrows("That operation is not supported.", 
-				OperationNotSupportedException.class, () -> 
-					vm1.convertListToOperations(vm1.list));
+		assertThrows(EmptyStackException.class, () -> 
+					new SimpleVM(reader1));
 		
 		/* Test simple, valid program case */
 		Scanner reader2 = new Scanner(new StringReader(
@@ -171,7 +172,6 @@ public class SimpleVMTest extends TestCase {
                 ));
 		
         SimpleVM vm2 = new SimpleVM(reader2);
-        vm2.convertListToOperations(vm2.list);
         assertEquals(3, vm2.operations.size());
         vm2.run();
         // check symbol 'x' equals the value 7
@@ -194,7 +194,7 @@ public class SimpleVMTest extends TestCase {
         SimpleVM vm = new SimpleVM(reader);
         assertThrows("The variable is not defined.",
 				RuntimeException.class, 
-				() -> vm.getValue("x"));
+				() -> vm.getValue("y"));
 	}
 	
 	/**
