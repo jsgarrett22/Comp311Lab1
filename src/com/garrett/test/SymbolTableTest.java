@@ -60,9 +60,12 @@ public class SymbolTableTest {
 	public void testSettingAndGettingSymbol() {
 		SymbolTable symbols = new SymbolTable();
 		
-		/* Set a valid symbol in the table and retrieve it */
+		/* Set valid symbols in the table and retrieve the correct one */
 		symbols.setValue("x", 5);
-		assertEquals(5, symbols.getValue("x"));
+		symbols.setValue("y", 10);
+		symbols.setValue("z", 15);
+		assertEquals(15, symbols.getValue("z"));
+		
 	}
 	
 	/**
