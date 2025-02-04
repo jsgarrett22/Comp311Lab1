@@ -19,32 +19,57 @@ import com.garrett.SymbolTable;
  */
 public class SymbolTableTest {
 
+	/**
+	 * Tests the default constructor properly creates a SymbolTable object.
+	 */
 	@Test
 	public void testSymbolTableDefaultConstructor() {
 		assertNotNull(new SymbolTable());
 	}
-
+	
+	/**
+	 * Tests the InvalidParameterException being thrown if attempting to add an empty Symbol.
+	 */
 	@Test
-	public void testGetAndSetValue() {
+	public void testAddingEmptySymbol() {
 		SymbolTable symbols = new SymbolTable();
 		
 		/* Set an invalid symbol in the table and catch the exception */
 		assertThrows("A symbol can not be empty",
 				InvalidParameterException.class, 
 				() -> symbols.setValue("", 100));
+	}
+	
+	/**
+	 * Tests a RuntimeException being thrown if attempting to get a Symbol that is doesn't
+	 * correspond to a value.
+	 */
+	@Test
+	public void testGettingASymbolThatDoesntExist() {
+		SymbolTable symbols = new SymbolTable();
+		/* Try getting an undefined symbol */
+		assertThrows("The variable is not defined in the table.",
+				RuntimeException.class, 
+				() -> symbols.getValue("a"));
+	}
+
+	/**
+	 * Tests the setting and getting of symbols and the corresponding values for each.
+	 */
+	@Test
+	public void testSettingAndGettingSymbol() {
+		SymbolTable symbols = new SymbolTable();
 		
 		/* Set a valid symbol in the table and retrieve it */
 		symbols.setValue("x", 5);
 		assertEquals(5, symbols.getValue("x"));
-		
-		/* Try getting an undefined symbol */
-		assertThrows("A symbol can not be empty",
-				RuntimeException.class, 
-				() -> symbols.getValue("a"));
 	}
 	
+	/**
+	 * Tests replacing an existing symbol's value with a new one.
+	 */
 	@Test
-	public void testReplacingExistingVariable() {
+	public void testReplacingExistingVariableValue() {
 		SymbolTable symbols = new SymbolTable();
 		symbols.setValue("x", 5);
 		assertEquals(1, symbols.size());
