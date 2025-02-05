@@ -6,15 +6,13 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
 
-import javax.naming.OperationNotSupportedException;
-
 public class SimpleVM
 {   
 	public List<String> list;
 	public List<Operation> operations;
 	public SymbolTable symbols;
 	public Stack<Integer> stack;
-	private int programCount;
+	public int programCount;
 	
     /**
      * Creates a SimpleVM with the program contained in 
@@ -34,7 +32,7 @@ public class SimpleVM
     	
         // Convert the text program into a list of Operation objects
     	convertTextToList(scanner);
-    	convertListToOperations(list);
+    	convertListToOperations(this.list);
     }
 
     /**
@@ -42,13 +40,9 @@ public class SimpleVM
      */
     public void run()
     {
-        //  convert list items to operation objects and execute each operation
-    	//convertListToOperations(list);
-    	
-    	/* for every operation object, invoke it's execute method
     	for (Operation o : operations) {
-    		programCount += o.execute(0, stack, symbols);
-    	}*/
+    		programCount = o.execute(programCount, stack, symbols);
+    	}
     }
     
     /**
@@ -101,7 +95,7 @@ public class SimpleVM
     				System.out.println("The value " + value + " is numeric.");
     				// push constant on top of stack
     				Operation operation = new PushOperation(Integer.parseInt(value));
-    				operation.execute(this.programCount, this.stack, this.symbols);
+    				//operation.execute(this.programCount, this.stack, this.symbols);
         			this.operations.add(operation);
     			} else {
     				// value is not numeric, and is a variable name.
@@ -109,11 +103,13 @@ public class SimpleVM
     				// check if variable is in symbols table
     				if (this.symbols.hasSymbol(value) != -1) {
     					Operation operation = new PushOperation(this.symbols.getValue(value));
-    					operation.execute(this.programCount, stack, symbols);
+    					//operation.execute(this.programCount, stack, symbols);
     					this.operations.add(operation);
     				} else {
-    					// symbol doesn't exist
-    					throw new EmptyStackException();    				
+    					// symbol doesn't exist in the table and we are trying to create
+    					// a push operation that needs the value of the variable
+    					Operation operation = new PushOperation(value);
+    					this.operations.add(operation);
     				}
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
@@ -121,7 +117,7 @@ public class SimpleVM
     			value = getItemValue(currentItem);
     			// create new pop operation and execute
     			Operation operation = new PopOperation(value);
-    			operation.execute(this.programCount, this.stack, this.symbols);
+    			//operation.execute(this.programCount, this.stack, this.symbols);
     			this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("add")) {
     			System.out.println(cmd);
@@ -183,13 +179,5 @@ public class SimpleVM
      */
     public boolean hasValue(String lineItem) {
     	return lineItem.contains(" ") ? true : false;
-    }
-    
-    /**
-     * Returns the current program count.
-     * @return the current count
-     */
-    public int getProgramCount() {
-    	return this.programCount;
     }
 }

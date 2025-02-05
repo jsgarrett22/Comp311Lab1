@@ -119,6 +119,7 @@ public class SimpleVMTest extends TestCase {
 		
 		SimpleVM vm = new SimpleVM(reader);
 		vm.run();
+		assertEquals(4, vm.programCount);
 		assertEquals(7, vm.getValue("x"));
 	}
 	
@@ -145,6 +146,7 @@ public class SimpleVMTest extends TestCase {
 		assertEquals(8, vm.list.size());
 		assertEquals(2, vm.stack.size());
 		assertEquals(7, vm.stack.getLast().intValue());
+		assertEquals(8, vm.programCount);
 		System.out.println(vm);
 	}
 	
