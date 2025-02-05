@@ -135,6 +135,18 @@ public class SimpleVM
     		} else if (cmd.equalsIgnoreCase("compareNEQ")) {
         		Operation operation = new CompareNEQOperation();
         		this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("compareGT")) {
+        		Operation operation = new CompareGTOperation();
+        		this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("compareGTE")) {
+            		Operation operation = new CompareGTEOperation();
+            		this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("compareLT")) {
+                	Operation operation = new CompareLTOperation();
+                	this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("compareLTE")) {
+                    Operation operation = new CompareLTEOperation();
+                    this.operations.add(operation);
     		} else {
     			System.out.println("That operation is not supported.");
     			throw new EmptyStackException();

@@ -7,18 +7,18 @@ import java.util.Stack;
 
 import org.junit.jupiter.api.Test;
 
-import com.garrett.CompareEQOperation;
+import com.garrett.CompareGTOperation;
 import com.garrett.PushOperation;
 import com.garrett.SymbolTable;
 
-class CompareEQOperationTest {
+class CompareGTOperationTest {
 
 	/**
 	 * Tests if constructing operation is dont correctly.
 	 */
 	@Test
-	void testCompareEQOperation() {
-		assertNotNull(new CompareEQOperationTest());
+	void testCompareGTOperation() {
+		assertNotNull(new CompareGTOperation());
 	}
 
 	/**
@@ -32,14 +32,14 @@ class CompareEQOperationTest {
 		SymbolTable symbols = new SymbolTable();
 		
 		/* Populate stack with 2 values */
-		PushOperation push1 = new PushOperation(5);
+		PushOperation push1 = new PushOperation(7);
 		PushOperation push2 = new PushOperation(5);
 		push1.execute(0, stack, symbols);
 		push2.execute(1, stack, symbols);
 		
 		/* Check if true */
-		CompareEQOperation compareEQ = new CompareEQOperation();
-		compareEQ.execute(0, stack, symbols);
+		CompareGTOperation compareGT = new CompareGTOperation();
+		compareGT.execute(0, stack, symbols);
 		assertEquals(Integer.valueOf(1), stack.peek());
 	}
 	
@@ -55,13 +55,13 @@ class CompareEQOperationTest {
 		
 		/* Populate stack with 2 values */
 		PushOperation push1 = new PushOperation(5);
-		PushOperation push2 = new PushOperation(10);
+		PushOperation push2 = new PushOperation(7);
 		push1.execute(0, stack, symbols);
 		push2.execute(1, stack, symbols);
 		
 		/* Check if false */
-		CompareEQOperation compareEQ = new CompareEQOperation();
-		compareEQ.execute(0, stack, symbols);
+		CompareGTOperation compareGT = new CompareGTOperation();
+		compareGT.execute(0, stack, symbols);
 		assertEquals(Integer.valueOf(0), stack.peek());
 	}
 
