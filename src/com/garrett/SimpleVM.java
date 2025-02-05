@@ -132,6 +132,9 @@ public class SimpleVM
     		} else if (cmd.equalsIgnoreCase("compareEQ")) {
     			Operation operation = new CompareEQOperation();
     			this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("compareNEQ")) {
+        		Operation operation = new CompareNEQOperation();
+        		this.operations.add(operation);
     		} else {
     			System.out.println("That operation is not supported.");
     			throw new EmptyStackException();
