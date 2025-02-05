@@ -126,6 +126,9 @@ public class SimpleVM
     		} else if (cmd.equalsIgnoreCase("divide")) {
     			Operation operation = new DivideOperation();
     			this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("nop")) {
+    			Operation operation = new NOPOperation();
+    			this.operations.add(operation);
     		} else {
     			System.out.println("That operation is not supported.");
     			throw new EmptyStackException();
