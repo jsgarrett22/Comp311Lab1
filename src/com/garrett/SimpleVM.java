@@ -95,7 +95,6 @@ public class SimpleVM
     				System.out.println("The value " + value + " is numeric.");
     				// push constant on top of stack
     				Operation operation = new PushOperation(Integer.parseInt(value));
-    				//operation.execute(this.programCount, this.stack, this.symbols);
         			this.operations.add(operation);
     			} else {
     				// value is not numeric, and is a variable name.
@@ -103,7 +102,6 @@ public class SimpleVM
     				// check if variable is in symbols table
     				if (this.symbols.hasSymbol(value) != -1) {
     					Operation operation = new PushOperation(this.symbols.getValue(value));
-    					//operation.execute(this.programCount, stack, symbols);
     					this.operations.add(operation);
     				} else {
     					// symbol doesn't exist in the table and we are trying to create
@@ -120,7 +118,8 @@ public class SimpleVM
     			//operation.execute(this.programCount, this.stack, this.symbols);
     			this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("add")) {
-    			System.out.println(cmd);
+    			Operation operation = new AddOperation();
+    			this.operations.add(operation);
     		} else {
     			System.out.println("That operation is not supported.");
     			throw new EmptyStackException();
