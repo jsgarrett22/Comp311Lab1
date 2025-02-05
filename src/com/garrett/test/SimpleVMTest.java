@@ -4,7 +4,6 @@ import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.security.InvalidParameterException;
 import java.util.EmptyStackException;
 import java.util.Scanner;
 

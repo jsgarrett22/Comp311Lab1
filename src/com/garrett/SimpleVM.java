@@ -111,14 +111,17 @@ public class SimpleVM
     				}
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
-    			// get the full string following the 'pop' command
     			value = getItemValue(currentItem);
-    			// create new pop operation and execute
     			Operation operation = new PopOperation(value);
-    			//operation.execute(this.programCount, this.stack, this.symbols);
     			this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("add")) {
     			Operation operation = new AddOperation();
+    			this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("subtract")) {
+    			Operation operation = new SubtractOperation();
+    			this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("multiply")) {
+    			Operation operation = new MultiplyOperation();
     			this.operations.add(operation);
     		} else {
     			System.out.println("That operation is not supported.");
