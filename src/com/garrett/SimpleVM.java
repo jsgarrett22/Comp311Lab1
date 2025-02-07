@@ -15,6 +15,7 @@ public class SimpleVM
 	public int programCount;
 	public int loopIndex;
 	public Parser parser;
+	List<Integer> listOfSkips;
 	
     /**
      * Creates a SimpleVM with the program contained in 
@@ -25,10 +26,6 @@ public class SimpleVM
      */
     public SimpleVM(Scanner scanner)
     {
-    	if (!scanner.hasNext()) {
-    		throw new IllegalArgumentException();
-    	}
-    	
     	// Initialize variables
     	parser = new Parser(scanner);
     	operations = new ArrayList<Operation>();
@@ -39,6 +36,7 @@ public class SimpleVM
     	
         // Convert the text program into a list of Operation objects
     	list = parser.parseStrings();
+    	listOfSkips = calculateSkips(list);
     	convertListToOperations(this.list);
     }
 
@@ -65,18 +63,6 @@ public class SimpleVM
     }
     
     /**
-     * Adds each line command of the program passed in to a list.
-     * @param scanner the program containing lines of different commands.
-     * @return the size of the list containing all the commands.
-     * @author Joshua S. Garrett
-     */
-    public void convertTextToList(Scanner scanner) {
-    	while (scanner.hasNextLine()) {
-    		list.add(scanner.nextLine());
-    	}
-    }
-    
-    /**
      * Converts each list element to its corresponding operation type.
      * @author Joshua S. Garrett
      * @throws OperationNotSupportedException 
@@ -97,68 +83,68 @@ public class SimpleVM
     			char c = value.charAt(0);
     			if (Character.isDigit(c)) {
     				System.out.println("The value " + value + " is numeric.");
-    				Operation operation = new PushOperation(Integer.parseInt(value));
-        			this.operations.add(operation);
+        			operations.add(new PushOperation(Integer.parseInt(value)));
     			} else {
-    				// symbol doesn't exist in the table and we are trying to create
-    				// a push operation that needs the value of the variable
-    				Operation operation = new PushOperation(value);
-    				this.operations.add(operation);
+    				operations.add(new PushOperation(value));
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
     			value = getItemValue(currentItem);
-    			Operation operation = new PopOperation(value);
-    			this.operations.add(operation);
+    			operations.add(new PopOperation(value));
     		} else if (cmd.equalsIgnoreCase("add")) {
-    			Operation operation = new AddOperation();
-    			this.operations.add(operation);
+    			operations.add(new AddOperation());
     		} else if (cmd.equalsIgnoreCase("subtract")) {
-    			Operation operation = new SubtractOperation();
-    			this.operations.add(operation);
+    			operations.add(new SubtractOperation());
     		} else if (cmd.equalsIgnoreCase("multiply")) {
-    			Operation operation = new MultiplyOperation();
-    			this.operations.add(operation);
+    			operations.add(new MultiplyOperation());
     		} else if (cmd.equalsIgnoreCase("divide")) {
-    			Operation operation = new DivideOperation();
-    			this.operations.add(operation);
+    			operations.add(new DivideOperation());
     		} else if (cmd.equalsIgnoreCase("nop")) {
-    			Operation operation = new NOPOperation();
-    			this.operations.add(operation);
+    			operations.add(new NOPOperation());
     		} else if (cmd.equalsIgnoreCase("compareEQ")) {
-    			Operation operation = new CompareEQOperation();
-    			this.operations.add(operation);
+    			operations.add(new CompareEQOperation());
     		} else if (cmd.equalsIgnoreCase("compareNEQ")) {
-        		Operation operation = new CompareNEQOperation();
-        		this.operations.add(operation);
+        		operations.add(new CompareNEQOperation());
     		} else if (cmd.equalsIgnoreCase("compareGT")) {
-        		Operation operation = new CompareGTOperation();
-        		this.operations.add(operation);
+        		operations.add(new CompareGTOperation());
     		} else if (cmd.equalsIgnoreCase("compareGTE")) {
-            	Operation operation = new CompareGTEOperation();
-            	this.operations.add(operation);
+            	operations.add(new CompareGTEOperation());
     		} else if (cmd.equalsIgnoreCase("compareLT")) {
-                Operation operation = new CompareLTOperation();
-                this.operations.add(operation);
+                operations.add(new CompareLTOperation());
     		} else if (cmd.equalsIgnoreCase("compareLTE")) {
-                Operation operation = new CompareLTEOperation();
-                this.operations.add(operation);
+                operations.add(new CompareLTEOperation());
     		} else if (cmd.equalsIgnoreCase("loop:") && hasLabel(currentItem)) {
-    			this.loopIndex = i;
-    			// grab second value parameter
+    			loopIndex = i;
     			value = getSecondItemValue(currentItem);
-    			Operation operation = new PushOperation(value);
-				this.operations.add(operation);
+				operations.add(new PushOperation(value));
     		} else if (cmd.equalsIgnoreCase("branchT")) {
-                Operation operation = new BranchTOperation(list.size());
-                this.operations.add(operation);
+                operations.add(new BranchTOperation(list.size()));
     		} else if (cmd.equalsIgnoreCase("branch") && hasValue(currentItem)) {
-                Operation operation = new BranchOperation(loopIndex);
-                this.operations.add(operation);
-    		} else if (cmd.equalsIgnoreCase("branch") && (!hasValue(currentItem))) {
-    			throw new IllegalArgumentException();
-    		} else if (cmd.equalsIgnoreCase("end:") && hasValue(currentItem)) {
-    			Operation operation = new NOPOperation();
-    			this.operations.add(operation);
+    			value = getItemValue(currentItem);
+    			// if branch has a label of 'loop', then branch loop
+    			if (value.equals("loop")) {
+    				operations.add(new BranchOperation(loopIndex));
+    			// if branch has a label of 'skip', then branch skip index 0
+    			} else if (value.equals("skip")) {
+    				operations.add(new BranchOperation(listOfSkips.get(0)));
+    			} else if (value.equals("skip2")) {
+    				operations.add(new BranchOperation(listOfSkips.get(1)));
+    			} else if (value.equals("skip3")) {
+    				operations.add(new BranchOperation(listOfSkips.get(2)));
+    			}
+    		} else if (cmd.equalsIgnoreCase("skip:") && hasValue(currentItem)) {
+    			operations.add(new PushOperation(1));
+    		} else if (cmd.equalsIgnoreCase("skip2:") && hasValue(currentItem)) {
+    			operations.add(new BranchOperation(5));
+    		} else if (cmd.equalsIgnoreCase("skip3:") && hasValue(currentItem)) {
+    			value = getSecondItemValue(currentItem);
+				operations.add(new PopOperation(value));
+    		} else if (cmd.equalsIgnoreCase("name:") && hasValue(currentItem)) {
+    			operations.add(new NOPOperation());
+    		} else if (cmd.equalsIgnoreCase("jumpback:") && hasValue(currentItem)) {
+    			value = getSecondItemValue(currentItem);
+				operations.add(new PushOperation(Integer.valueOf(value)));
+    		}else if (cmd.equalsIgnoreCase("end:") && hasValue(currentItem)) {
+    			operations.add(new NOPOperation());
     		} else {
     			throw new IllegalArgumentException("That operation is not supported.");
     		}
@@ -249,5 +235,23 @@ public class SimpleVM
     		}
     	}
     	return false;
+    }
+    
+    /**
+     * Locates the index of each skip command and assigns it an index
+     * in a returned list of integers.
+     * @param list the list of Strings to check
+     * @return list the list of indexes containing the skip commands in order.
+     */
+    private List<Integer> calculateSkips(List<String> list) {
+    	List<Integer> output = new ArrayList<Integer>();
+    	// loop for every item
+    	for (int i = 0; i < list.size(); i++) {
+    		String currentStr = list.get(i);
+    		if (currentStr.startsWith("skip")) {
+    			output.add(i);
+    		}
+    	}
+    	return output;
     }
 }

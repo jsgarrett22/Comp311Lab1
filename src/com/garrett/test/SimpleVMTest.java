@@ -86,7 +86,7 @@ public class SimpleVMTest extends TestCase {
 	@Test
 	public void testMissingLabel() {
 		Scanner reader = new Scanner(new StringReader(
-                "\n"));
+                "branch\n"));
 		assertThrows(IllegalArgumentException.class, () -> new SimpleVM(reader));
 	}
 	
@@ -456,6 +456,36 @@ public class SimpleVMTest extends TestCase {
     	assertEquals(5050, vm.symbols.getValue("sum"));
     	assertEquals(101, vm.symbols.getValue("count"));
     	assertEquals(18, vm.programCount);
+    	assertEquals(0, vm.stack.size());
+    }
+    
+    /**
+     * Tests a simplified case with branching with valid labels.
+     */
+    @Test
+    public void testComplicatedProgramTwo() {
+    	Scanner reader = new Scanner(new StringReader(
+    			"branch skip\n"
+    			+ "push 0\n"
+    			+ "skip: push 1\n"
+    			+ "pop x\n"
+    			+ "branch skip2\n"
+    			+ "jumpback: push 1\n"
+    			+ "branch skip3\n"
+    			+ "skip2: branch jumpback\n"
+    		    + "skip3: pop y\n"
+    		    + "push 1000\n"
+    		    + "pop name\n"
+    		    + "name: nop\n"
+    			+ "push 13\n"
+    			+ "pop z\n"
+    			));
+    	
+    	SimpleVM vm = new SimpleVM(reader);
+    	vm.run();
+    	assertEquals(1, vm.symbols.getValue("x"));
+    	assertEquals(1, vm.symbols.getValue("y"));
+    	assertEquals(1000, vm.symbols.getValue("name"));
     	assertEquals(0, vm.stack.size());
     }
 }
