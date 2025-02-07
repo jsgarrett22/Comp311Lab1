@@ -13,7 +13,7 @@ public class PushOperation implements Operation {
     private String symbol;
     
     public PushOperation(String symbol) {
-    	this.value = -1;
+    	this.value = 0;
     	this.symbol = symbol;
     }
 

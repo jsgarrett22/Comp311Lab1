@@ -13,6 +13,8 @@ public class SimpleVM
 	public SymbolTable symbols;
 	public Stack<Integer> stack;
 	public int programCount;
+	public int loopIndex;
+	public Parser parser;
 	
     /**
      * Creates a SimpleVM with the program contained in 
@@ -23,15 +25,20 @@ public class SimpleVM
      */
     public SimpleVM(Scanner scanner)
     {
+    	if (!scanner.hasNext()) {
+    		throw new IllegalArgumentException();
+    	}
+    	
     	// Initialize variables
-    	list = new ArrayList<String>();
+    	parser = new Parser(scanner);
     	operations = new ArrayList<Operation>();
     	symbols = new SymbolTable();
     	stack = new Stack<Integer>();
     	programCount = 0;
+    	loopIndex = 0;
     	
         // Convert the text program into a list of Operation objects
-    	convertTextToList(scanner);
+    	list = parser.parseStrings();
     	convertListToOperations(this.list);
     }
 
@@ -40,8 +47,8 @@ public class SimpleVM
      */
     public void run()
     {
-    	for (Operation o : operations) {
-    		programCount = o.execute(programCount, stack, symbols);
+    	while (programCount < operations.size()) {
+    		programCount = operations.get(programCount).execute(programCount, stack, symbols);
     	}
     }
     
@@ -75,40 +82,28 @@ public class SimpleVM
      * @throws OperationNotSupportedException 
      */
     public void convertListToOperations(List<String> list) {
-    	// for each element in list
-    		// get list item
-    		// get command
-    		// get the value (string)
-    		// 		new PushOperation(value);
+    	
     	String cmd = "";
     	String value = "";
+    	
     	for (int i = 0; i < this.list.size(); i++) {
-    		// get current listItem
+    		
     		String currentItem = this.list.get(i);
-    		// get command
     		cmd = getItemCommand(currentItem);
+    		
     		if (cmd.equalsIgnoreCase("push") && hasValue(currentItem)) {
-    			// get value
+    			
     			value = getItemValue(currentItem);
     			char c = value.charAt(0);
     			if (Character.isDigit(c)) {
     				System.out.println("The value " + value + " is numeric.");
-    				// push constant on top of stack
     				Operation operation = new PushOperation(Integer.parseInt(value));
         			this.operations.add(operation);
     			} else {
-    				// value is not numeric, and is a variable name.
-    				System.out.println("The value " + value + " is not numeric.");
-    				// check if variable is in symbols table
-    				if (this.symbols.hasSymbol(value) != -1) {
-    					Operation operation = new PushOperation(this.symbols.getValue(value));
-    					this.operations.add(operation);
-    				} else {
-    					// symbol doesn't exist in the table and we are trying to create
-    					// a push operation that needs the value of the variable
-    					Operation operation = new PushOperation(value);
-    					this.operations.add(operation);
-    				}
+    				// symbol doesn't exist in the table and we are trying to create
+    				// a push operation that needs the value of the variable
+    				Operation operation = new PushOperation(value);
+    				this.operations.add(operation);
     			}
     		} else if (cmd.equalsIgnoreCase("pop") && hasValue(currentItem)) {
     			value = getItemValue(currentItem);
@@ -139,19 +134,41 @@ public class SimpleVM
         		Operation operation = new CompareGTOperation();
         		this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("compareGTE")) {
-            		Operation operation = new CompareGTEOperation();
-            		this.operations.add(operation);
+            	Operation operation = new CompareGTEOperation();
+            	this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("compareLT")) {
-                	Operation operation = new CompareLTOperation();
-                	this.operations.add(operation);
+                Operation operation = new CompareLTOperation();
+                this.operations.add(operation);
     		} else if (cmd.equalsIgnoreCase("compareLTE")) {
-                    Operation operation = new CompareLTEOperation();
-                    this.operations.add(operation);
+                Operation operation = new CompareLTEOperation();
+                this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("loop:") && hasLabel(currentItem)) {
+    			this.loopIndex = i;
+    			// grab second value parameter
+    			value = getSecondItemValue(currentItem);
+    			Operation operation = new PushOperation(value);
+				this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("branchT")) {
+                Operation operation = new BranchTOperation(list.size());
+                this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("branch") && hasValue(currentItem)) {
+                Operation operation = new BranchOperation(loopIndex);
+                this.operations.add(operation);
+    		} else if (cmd.equalsIgnoreCase("branch") && (!hasValue(currentItem))) {
+    			throw new IllegalArgumentException();
+    		} else if (cmd.equalsIgnoreCase("end:") && hasValue(currentItem)) {
+    			Operation operation = new NOPOperation();
+    			this.operations.add(operation);
     		} else {
-    			System.out.println("That operation is not supported.");
-    			throw new EmptyStackException();
+    			throw new IllegalArgumentException("That operation is not supported.");
     		}
     	}
+    	System.out.println("-----------------------------------------");
+    	System.out.println("Done converting list items to operations.");
+		System.out.println("Current list item size: " + this.list.size());
+		System.out.println("The loop command is at index: " + loopIndex);
+		System.out.println("-----------------------------------------");
+		System.out.println();
     }
     
     /**
@@ -189,12 +206,21 @@ public class SimpleVM
      * @author Joshua S. Garrett
      */
     public String getItemValue(String lineItem) {
-    	// if line item has value
-    	// return value
-    	// else return ""
     	if (hasValue(lineItem)) {
     		String[] str = lineItem.split("\s");
     		return str[1];
+    	}
+    	return "";
+    }
+    
+    /**
+     * Utility method: Returns the second value of a line item if it has one.
+     * @author Joshua S. Garrett
+     */
+    public String getSecondItemValue(String lineItem) {
+    	if (hasValue(lineItem)) {
+    		String[] str = lineItem.split("\s");
+    		return str[2];
     	}
     	return "";
     }
@@ -205,5 +231,23 @@ public class SimpleVM
      */
     public boolean hasValue(String lineItem) {
     	return lineItem.contains(" ") ? true : false;
+    }
+    
+    /**
+     * Utility method: Determines if a line item has a valid label following
+     * the command or not.
+     * @author Joshua S. Garrett
+     */
+    public boolean hasLabel(String lineItem) {
+    	if (hasValue(lineItem)) {
+    		String[] str = lineItem.split("\s");
+    		if (str.length > 1) {
+    			return true;
+    		}
+    		else {
+    			return false;
+    		}
+    	}
+    	return false;
     }
 }

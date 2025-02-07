@@ -55,7 +55,7 @@ public class SymbolTable
     {
     	for (int i = 0; i < symbols.size(); i++) {
     		Symbol currentSymbol = symbols.get(i);
-    		if (currentSymbol.getSymbol().equals(name)) {
+    		if (currentSymbol.getSymbol().equalsIgnoreCase(name)) {
     			return currentSymbol.getValue();
     		}
     	}

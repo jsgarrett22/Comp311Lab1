@@ -21,6 +21,7 @@ public class CompareGTOperation implements Operation {
 	}
 	
 	private int compare(int num1, int num2) {
+		System.out.println("Count: " + num2 + " > Limit " + num1 + " = [" + (num2 > num1) + "]");
 		return (num2 > num1) ? 1 : 0;
 	}
 

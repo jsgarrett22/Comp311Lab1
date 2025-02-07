@@ -37,6 +37,7 @@ public class AddOperation implements Operation {
 	 * @return the result of adding both operands together
 	 */
 	final private int add(int num1, int num2) {
+		System.out.println("Adding " + num1 + " and " + num2);
 		return num1 + num2;
 	}
 

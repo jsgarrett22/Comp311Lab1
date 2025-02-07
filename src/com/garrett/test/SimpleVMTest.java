@@ -77,7 +77,17 @@ public class SimpleVMTest extends TestCase {
 	public void testInvalidPush() throws OperationNotSupportedException, IOException {
 		Scanner reader = new Scanner(new StringReader(
                 "push\n"));
-		assertThrows(EmptyStackException.class, () -> new SimpleVM(reader));
+		assertThrows(IllegalArgumentException.class, () -> new SimpleVM(reader));
+	}
+	
+	/**
+	 * Tests a missing label command.
+	 */
+	@Test
+	public void testMissingLabel() {
+		Scanner reader = new Scanner(new StringReader(
+                "\n"));
+		assertThrows(IllegalArgumentException.class, () -> new SimpleVM(reader));
 	}
 	
 	/**
@@ -87,7 +97,9 @@ public class SimpleVMTest extends TestCase {
 	public void testPushWithoutExistingValue() throws OperationNotSupportedException, IOException {
 		Scanner reader = new Scanner(new StringReader(
                 "push x\n"));
-		assertThrows(EmptyStackException.class, () -> new SimpleVM(reader));
+		SimpleVM vm = new SimpleVM(reader);
+		assertEquals(1, vm.operations.size());
+		assertEquals(-1, vm.symbols.hasSymbol("x"));
 	}
 
 	/**
@@ -99,7 +111,7 @@ public class SimpleVMTest extends TestCase {
 	public void testInvalidPop() throws OperationNotSupportedException, IOException {
 		Scanner reader = new Scanner(new StringReader(
                 "pop\n"));
-		assertThrows(EmptyStackException.class, () -> new SimpleVM(reader));
+		assertThrows(IllegalArgumentException.class, () -> new SimpleVM(reader));
 	}
 	
 	/**
@@ -162,7 +174,7 @@ public class SimpleVMTest extends TestCase {
 				"calculate 100\n"
 				));
 		
-		assertThrows(EmptyStackException.class, () -> 
+		assertThrows(IllegalArgumentException.class, () -> 
 					new SimpleVM(reader1));
 		
 		/* Test simple, valid program case */
@@ -411,5 +423,39 @@ public class SimpleVMTest extends TestCase {
 
         vm = new SimpleVM(reader2);
         assertEquals("[push 5, push 7, add, pop x, push x, push 3, add, pop y]", vm.toString());
+    }
+    
+    /**
+     * Tests a simplified case with branching.
+     */
+    @Test
+    public void testComplicatedProgram() {
+    	Scanner reader = new Scanner(new StringReader(
+                "push 0\n"
+    			+ "pop sum\n"
+                + "push 0\n"
+    			+ "pop count\n"
+                + "loop: push count\n"
+    			+ "push 100\n"
+                + "compareGT\n"
+    			+ "branchT end\n"
+                + "push sum\n"
+    			+ "push count\n"
+                + "add\n"
+    			+ "pop sum\n"
+                + "push count\n"
+    			+ "push 1\n"
+                + "add\n"
+    			+ "pop count\n"
+                + "branch loop\n"
+    			+ "end: nop\n"
+                ));
+    	
+    	SimpleVM vm = new SimpleVM(reader);
+    	vm.run();
+    	assertEquals(5050, vm.symbols.getValue("sum"));
+    	assertEquals(101, vm.symbols.getValue("count"));
+    	assertEquals(18, vm.programCount);
+    	assertEquals(0, vm.stack.size());
     }
 }
