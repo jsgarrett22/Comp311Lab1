@@ -116,8 +116,15 @@ public class SimpleVM
     			loopIndex = i;
     			value = getSecondItemValue(currentItem);
 				operations.add(new PushOperation(value));
-    		} else if (cmd.equalsIgnoreCase("branchT")) {
-                operations.add(new BranchTOperation(list.size()));
+    		} else if (cmd.equalsIgnoreCase("branchT") && hasValue(currentItem)) {
+    			value = getItemValue(currentItem);
+    			if (value.equals("end")) {
+    				operations.add(new BranchTOperation(list.size()));
+    			} else if (value.equals("skip")) {
+    				operations.add(new BranchTOperation(listOfSkips.get(0)));
+    			} else if (value.equals("skip2")) {
+    				operations.add(new BranchTOperation(listOfSkips.get(1)));
+    			}
     		} else if (cmd.equalsIgnoreCase("branch") && hasValue(currentItem)) {
     			value = getItemValue(currentItem);
     			// if branch has a label of 'loop', then branch loop
@@ -131,10 +138,23 @@ public class SimpleVM
     			} else if (value.equals("skip3")) {
     				operations.add(new BranchOperation(listOfSkips.get(2)));
     			}
-    		} else if (cmd.equalsIgnoreCase("skip:") && hasValue(currentItem)) {
-    			operations.add(new PushOperation(1));
+    		} else if (cmd.equalsIgnoreCase("skip") || (cmd.equals("skip:")) && hasValue(currentItem)) {
+    			String firstParameter = getItemValue(currentItem);
+    			if (firstParameter.equals("nop")) {
+    				operations.add(new NOPOperation());
+    			}
+    			value = getSecondItemValue(currentItem);
+				operations.add(new PushOperation(Integer.valueOf(value)));
     		} else if (cmd.equalsIgnoreCase("skip2:") && hasValue(currentItem)) {
-    			operations.add(new BranchOperation(5));
+    			if (hasSecondValue(currentItem)) {
+    				value = getSecondItemValue(currentItem);
+        			operations.add(new BranchOperation(Integer.valueOf(5)));
+    			} else {
+    				String firstParameter = getItemValue(currentItem);
+        			if (firstParameter.equals("nop")) {
+        				operations.add(new NOPOperation());
+        			}
+    			}
     		} else if (cmd.equalsIgnoreCase("skip3:") && hasValue(currentItem)) {
     			value = getSecondItemValue(currentItem);
 				operations.add(new PopOperation(value));
@@ -208,7 +228,7 @@ public class SimpleVM
     		String[] str = lineItem.split("\s");
     		return str[2];
     	}
-    	return "";
+    	return null;
     }
     
     /**
@@ -217,6 +237,14 @@ public class SimpleVM
      */
     public boolean hasValue(String lineItem) {
     	return lineItem.contains(" ") ? true : false;
+    }
+    
+    /**
+     * Utility method: Checks if a line item has a length of three.
+     */
+    public boolean hasSecondValue(String lineItem) {
+    	String[] str = lineItem.split("\s");
+    	return (str.length == 3) ? true : false;
     }
     
     /**

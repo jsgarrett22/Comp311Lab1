@@ -4,7 +4,6 @@ import static org.junit.Assert.assertThrows;
 
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.EmptyStackException;
 import java.util.Scanner;
 
 import javax.naming.OperationNotSupportedException;
@@ -486,6 +485,35 @@ public class SimpleVMTest extends TestCase {
     	assertEquals(1, vm.symbols.getValue("x"));
     	assertEquals(1, vm.symbols.getValue("y"));
     	assertEquals(1000, vm.symbols.getValue("name"));
+    	assertEquals(0, vm.stack.size());
+    }
+    
+    /**
+     * Tests a complicated case with branching and a BranchT.
+     */
+    @Test
+    public void testComplicatedProgramThree() {
+    	Scanner reader = new Scanner(new StringReader(
+    			"push 0\n"
+    			+ "pop x\n"
+    			+ "push 0\n"
+    			+ "pop y\n"
+    			+ "push 1\n"
+    			+ "branchT skip\n"
+    			+ "push 1\n"
+    			+ "pop x\n"
+    		    + "skip push 0\n"
+    		    + "branchT skip2\n"
+    		    + "push 1\n"
+    		    + "pop y\n"
+    			+ "skip2: nop\n"
+    			));
+    	
+    	SimpleVM vm = new SimpleVM(reader);
+    	vm.run();
+    	assertEquals(0, vm.symbols.getValue("x"));
+    	assertEquals(1, vm.symbols.getValue("y"));
+    	assertEquals(13, vm.programCount);
     	assertEquals(0, vm.stack.size());
     }
 }
